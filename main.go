@@ -20,10 +20,26 @@ func main() {
 }
 
 func dirTree(out io.Writer, path string, printFiles bool) error {
-	dirs, err := os.Open(path)
+	err := getTree(&out, path, printFiles)
 	if err != nil {
-		return fmt.Errorf("dirs was broken")
+		return err
 	}
-	fmt.Println(dirs)
+	return nil
+}
+func getTree(out *io.Writer, path string, printFiles bool) error {
+	arr, err := os.ReadDir(path)
+	if err != nil {
+		return err
+	}
+	for _, obj := range arr {
+		if obj.IsDir() {
+			err := getTree(out, path+"/"+obj.Name(), printFiles)
+			if err != nil {
+				return err
+			}
+		} else {
+			fmt.Println(obj.Name())
+		}
+	}
 	return nil
 }
